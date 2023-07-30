@@ -1,0 +1,47 @@
+version: '3'
+services:
+  client:
+    build: ./client
+    image: client
+    container_name: myclient-container
+    ports:
+      - '5173:5173'
+    stdin_open: true   # Keep standard input open
+    tty: true
+    depends_on:
+      - server
+    networks:
+      - mern-auth
+    
+
+  server:
+    build: ./server
+    image: server
+    container_name: myserver-container
+    restart: always
+    ports:
+      - '8000:8000'
+    depends_on:
+      - database
+    env_file: 
+      - ./server/.env
+    networks:
+      - mern-auth
+
+  database:
+    image: mongo
+    container_name: db
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+    networks:
+      - mern-auth
+
+networks:
+  mern-auth:
+    driver: bridge  
+
+volumes:
+  mongo-data:
